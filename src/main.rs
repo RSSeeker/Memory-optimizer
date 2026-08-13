@@ -70,8 +70,8 @@ fn main() {
 mod windows {
     use std::ffi::c_void;
     use std::mem::size_of;
-    use std::ptr::null_mut;
     use std::process::Command;
+    use std::ptr::null_mut;
 
     #[repr(C)]
     #[derive(Clone, Copy, Default)]
@@ -139,7 +139,10 @@ mod windows {
         fn GetCurrentProcess() -> *mut c_void;
         fn CloseHandle(object: *mut c_void) -> i32;
         fn GlobalMemoryStatusEx(buffer: *mut MemoryStatusEx) -> i32;
-        fn GetConsoleProcessList(process_list: *mut u32, process_count: u32) -> u32;
+        fn GetConsoleProcessList(
+            process_list: *mut u32,
+            process_count: u32,
+        ) -> u32;
     }
 
     #[link(name = "advapi32")]
@@ -217,10 +220,7 @@ mod windows {
         println!("== 内存整理工具 ==");
         println!("总内存: {}", format_bytes(status.ull_total_phys));
         println!("可用内存: {}", format_bytes(status.ull_avail_phys));
-        println!(
-            "管理员权限: {}",
-            if is_elevated() { "是" } else { "否" }
-        );
+        println!("管理员权限: {}", if is_elevated() { "是" } else { "否" });
         println!(
             "提示: 直接运行将清理系统文件缓存与待机列表，非管理员时会弹出 UAC 请求。"
         );
@@ -272,7 +272,10 @@ mod windows {
                 let mut wide = privilege.encode_utf16().collect::<Vec<_>>();
                 wide.push(0);
                 let mut luid = Luid::default();
-                if unsafe { LookupPrivilegeValueW(null_mut(), wide.as_ptr(), &mut luid) } == 0 {
+                if unsafe {
+                    LookupPrivilegeValueW(null_mut(), wide.as_ptr(), &mut luid)
+                } == 0
+                {
                     return Err(std::io::Error::last_os_error().to_string());
                 }
                 let privileges = TokenPrivileges {
@@ -283,7 +286,14 @@ mod windows {
                     }],
                 };
                 if unsafe {
-                    AdjustTokenPrivileges(token, 0, &privileges, 0, null_mut(), null_mut())
+                    AdjustTokenPrivileges(
+                        token,
+                        0,
+                        &privileges,
+                        0,
+                        null_mut(),
+                        null_mut(),
+                    )
                 } == 0
                 {
                     return Err(std::io::Error::last_os_error().to_string());
@@ -321,7 +331,8 @@ mod windows {
                     )
                 });
             }
-            statuses.push(unsafe { NtSetSystemInformation(155, null_mut(), 0) });
+            statuses
+                .push(unsafe { NtSetSystemInformation(155, null_mut(), 0) });
             let mut combine = MemoryCombineInformationEx::default();
             statuses.push(unsafe {
                 NtSetSystemInformation(
@@ -366,7 +377,9 @@ mod windows {
     /// 双击运行（控制台仅有本进程）时，结束后暂停等待回车，方便查看结果。
     pub fn pause_if_double_clicked() {
         let mut list = [0u32; 2];
-        let count = unsafe { GetConsoleProcessList(list.as_mut_ptr(), list.len() as u32) };
+        let count = unsafe {
+            GetConsoleProcessList(list.as_mut_ptr(), list.len() as u32)
+        };
         if count == 1 {
             println!();
             println!("按回车键退出…");

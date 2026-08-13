@@ -1,0 +1,55 @@
+name: Release
+
+# 推送形如 v0.1.0 / v0.1.0-rc.1 的 tag 时自动构建并发布。
+# 带 -alpha/-beta/-rc/-pre/-preview 后缀的 tag 发布为预发布（Pre-release），
+# 其余 v* tag 发布为正式版。
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & publish release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build (release)
+        run: cargo build --release
+
+      - name: Smoke test
+        run: .\target\release\memory-optimizer.exe --status
+
+      - name: Package ZIP
+        shell: pwsh
+        run: |
+          Compress-Archive -Path .\target\release\memory-optimizer.exe -DestinationPath memory-optimizer-windows-x64.zip
+          Get-FileHash .\target\release\memory-optimizer.exe -Algorithm SHA256 | Format-List
+
+      - name: Detect pre-release
+        id: meta
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $prerelease = 'false'
+          if ($tag -match '-(alpha|beta|rc|pre|preview)([.-]?[0-9]*)?$') {
+            $prerelease = 'true'
+          }
+          "prerelease=$prerelease" >> $env:GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            target/release/memory-optimizer.exe
+            memory-optimizer-windows-x64.zip
+          prerelease: ${{ steps.meta.outputs.prerelease }}
+          generate_release_notes: true

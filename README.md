@@ -1,5 +1,8 @@
 # 内存整理工具（Memory Optimizer）
 
+![CI](https://github.com/RSSeeker/Memory-optimizer/actions/workflows/ci.yml/badge.svg)
+[Releases](https://github.com/RSSeeker/Memory-optimizer/releases)
+
 Windows 一键内存整理的独立工具：释放被系统文件缓存与待机列表占用的内存。
 纯 Rust 标准库 + Windows FFI，零第三方依赖。
 
@@ -18,6 +21,12 @@ cargo build --release
 ```
 
 产物位于 `target/release/memory-optimizer.exe`。
+
+## 自动化构建与发布
+
+- 每次推送 / PR 自动执行 `cargo fmt`、`cargo clippy`、Release 构建与冒烟测试（CI 工作流）。
+- 推送形如 `v0.1.0-rc.1` 的 tag 会自动构建并发布为 **预发布**（Pre-release）。
+- 推送形如 `v0.1.0` 的 tag 会自动构建并发布为 **正式版**。
 
 ## 用法
 
