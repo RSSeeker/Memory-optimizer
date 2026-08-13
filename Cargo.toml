@@ -1,0 +1,10 @@
+[package]
+name = "memory-optimizer"
+version = "0.1.0"
+edition = "2021"
+description = "Windows 一键内存整理独立工具"
+license = "GPL-3.0"
+
+# 空 workspace 表：让本 crate 独立于仓库根目录的 Cargo workspace，
+# 不依赖 theseus / tauri 等启动器代码，可单独编译。
+[workspace]
