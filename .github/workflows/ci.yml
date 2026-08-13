@@ -19,6 +19,8 @@ jobs:
       - name: Install Rust (stable)
         uses: dtolnay/rust-toolchain@stable
         with:
+          # 固定版本，保证与本地 rustfmt / clippy 输出一致
+          toolchain: 1.97.1
           components: clippy, rustfmt
 
       - name: Cache Cargo
@@ -57,6 +59,8 @@ jobs:
 
       - name: Install Rust (stable)
         uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.97.1
 
       - name: Build (release)
         run: cargo build --release
