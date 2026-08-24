@@ -22,13 +22,6 @@ cargo build --release
 
 产物位于 `target/release/memory-optimizer.exe`。
 
-## 自动化构建与发布
-
-- 每次推送 / PR 自动执行 `cargo fmt`、`cargo clippy`、Release 构建与冒烟测试（CI 工作流）。
-- 推送形如 `v0.1.0-rc.1` 的 tag 会自动构建并发布为 **预发布**（Pre-release）。
-- 推送形如 `v0.1.0` 的 tag 会自动构建并发布为 **正式版**。
-- CI 固定使用 Rust 1.97.1，保证格式化与警告检查结果和本地一致。
-
 ## 用法
 
 | 命令 | 说明 |
