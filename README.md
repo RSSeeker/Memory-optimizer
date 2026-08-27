@@ -16,7 +16,7 @@ Windows 一键内存整理的独立工具：释放被系统文件缓存与待机
 ## 编译
 
 ```bash
-cd tools/memory-optimizer
+cd .../memory-optimizer
 cargo build --release
 ```
 
